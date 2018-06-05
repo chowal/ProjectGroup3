@@ -19,7 +19,7 @@ class city_obj():
     """
     def __init__(self, city_id, x_coord, y_coord):
         self.cid = city_id
-        self.priority = None
+        self.priority = 1
         self.parent = None
         self.x = x_coord
         self.y = y_coord
@@ -49,12 +49,12 @@ class tsp():
             # grabbing the coordinates
             coords = city.split(' ')[-2:]
             # creating a new city object with id and coordinates 
-            new_city = city_obj(city_id, coords[0], coords[1])
+            new_city = city_obj(city_id, int(coords[0]), int(coords[1]))
             # adding the new city to the list of cities
             self.cities.append(new_city)
 
 
-    def prims(city_list):
+    def prims(self, city_list):
         """
             Utilizes Prim's Minimal Spannt Tree Algorithm
             -> creates a graph
@@ -69,22 +69,22 @@ class tsp():
             v.parent = start
         MST = []
         for i in range(len(city_list)):
-            minimum = 999999999
-            minVertex = None
+            minimum = 9999999999999
+            minVertex = city_obj(0,0,0)
             for v in city_list:
-                if v.priority > 0 and v.priority < min:
+                if v.priority > 0 and v.priority < minimum:
                     minimum = v.priority
                     minVertex = v
             minVertex.priority = 0
             # add edge to MST
             #MST.append(
             for v in city_list:
-                if v.priority > distance(v, minVertex):
-                    v.priority = distance(v, minVertex):
+                if v.priority > self.distance(v, minVertex):
+                    v.priority = self.distance(v, minVertex)
                     v.parent = minVertex
         
 
-    def distance(c1, c2):
+    def distance(self, c1, c2):
         """
             Calculates the distance between 2 ciites
             Formula: 
@@ -108,5 +108,4 @@ if __name__ == "__main__":
     
     t = tsp(arg.filename)
     t.process_file()
-    for i in t.cities:
-        print i.cid, i.x, i.y
+    t.prims(t.cities)
