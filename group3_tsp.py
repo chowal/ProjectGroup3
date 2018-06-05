@@ -76,7 +76,12 @@ class tsp():
                     minimum = v.priority
                     minVertex = v
             minVertex.priority = 0
-            MST.append(
+            # add edge to MST
+            #MST.append(
+            for v in city_list:
+                if v.priority > distance(v, minVertex):
+                    v.priority = distance(v, minVertex):
+                    v.parent = minVertex
         
 
     def distance(c1, c2):
