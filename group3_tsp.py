@@ -56,7 +56,7 @@ class tsp():
 
     def prims(self, city_list):
         """
-            Utilizes Prim's Minimal Spannt Tree Algorithm
+            Utilizes Prim's Minimal Spanning Tree Algorithm
             -> creates a graph
             Param:
                 list of cities
