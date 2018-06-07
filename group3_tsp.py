@@ -141,7 +141,7 @@ class tsp():
         """
         x = (c2.x - c1.x) ** 2
         y = (c2.y - c1.y) ** 2
-        d = math.sqrt(x + y)
+        d = int(round(math.sqrt(x + y)))
         return d
 
 
