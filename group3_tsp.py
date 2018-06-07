@@ -6,6 +6,7 @@
 import argparse
 import math
 from collections import defaultdict
+from datetime import datetime
 
 def addEdge(graph, u, v):
     graph[u].append(v)
@@ -200,8 +201,8 @@ def connection_cleanup(mst_set, v1, v2):
 
     return mst_set
 
-def print_list(eul_list):
-    outfile = 'output.txt'
+def print_list(eul_list, f_name):
+    outfile = "group3_" + f_name + ".tour"
     f = open(outfile, 'w')
     ans = 0
     for i in eul_list:
@@ -226,7 +227,8 @@ if __name__ == "__main__":
 
     t = tsp(arg.filename)
     t.process_file()
-
+   
+    start = datetime.now().time()
     myList = t.prims(t.cities)
     updList = euler_tour(myList)
 
@@ -243,5 +245,9 @@ if __name__ == "__main__":
             current = v
 
     path.append(path[0])
+    finish = datetime.now().time()
+    t_format = "%H:%M:%S.%f"
+    delta = datetime.strptime(str(finish), t_format) - datetime.strptime(str(start), t_format)
+    print("Completion time: ", delta)
     #print("Path: ", *path)
-    print_list(updList)
+    print_list(updList, arg.filename)
