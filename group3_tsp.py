@@ -23,7 +23,7 @@ def generate_edges(graph):
         # for each neighbour node of a single node
         for neighbour in graph[node]:
             # if edge exists then append
-            edges.append((node, neighbour))
+            edges.append((node.cid, neighbour.cid))
     return edges
 
 
@@ -88,7 +88,8 @@ class tsp():
             v.priority = self.distance(v, start)
             v.parent = start
         mst = defaultdict(list)
-        for i in range(len(city_list)):
+        for i in range(len(city_list)-1git
+        ):
             minimum = 9999999999999
             minVertex = city_obj(0,0,0)
             for v in city_list:
@@ -102,7 +103,8 @@ class tsp():
                 if v.priority > self.distance(v, minVertex):
                     v.priority = self.distance(v, minVertex)
                     v.parent = minVertex
-        
+
+        print(generate_edges(mst))
 
     def distance(self, c1, c2):
         """
