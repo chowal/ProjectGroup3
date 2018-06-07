@@ -148,29 +148,30 @@ def euler_tour(mst_set):
     # Loop through the entire MST tree until we have no more available elements to pull from
     while len(mst_set) > 0:
         #
-        for i, v in enumerate(circuit):
-            if len(city_sets[v]) > 0:
+        for i, curr_city in enumerate(circuit):
+            if len(city_sets[curr_city]) > 0:
                 break
         # While the total number remaining cities is above 0...
-        while len(city_sets[v]) > 0:
+        while len(city_sets[curr_city]) > 0:
             # Save the current city number temporarily
-            temp = city_sets[v][0]
-
-            connection_cleanup(mst_set, v, temp)
-
-            del city_sets[v][(city_sets[v].index(temp))]
-            del city_sets[temp][(city_sets[temp].index(v))]
+            temp = city_sets[curr_city][0]
+            # Check for duplicate connections like it
+            connection_cleanup(mst_set, curr_city, temp)
+            # Remove city from the set so it cannot be used again
+            del city_sets[curr_city][(city_sets[curr_city].index(temp))]
+            del city_sets[temp][(city_sets[temp].index(curr_city))]
 
             i += 1
+            # Add the previously deleted city back into the circuit
             circuit.insert(i, temp)
 
-            v = temp
+            curr_city = temp
 
     return circuit
 
 
 def connection_cleanup(mst_set, v1, v2):
-
+    # This is to validate that there are no duplicate connections in our MST_SET
     for i, item in enumerate(mst_set):
         if (item[0] == v2 and item[1] == v1) or (item[0] == v1 and item[1] == v2):
             del mst_set[i]
@@ -193,9 +194,7 @@ if __name__ == "__main__":
     t = tsp('tsp_example_1.txt')
     t.process_file()
     myList = t.prims(t.cities)
-    print (myList)
     updList = euler_tour(myList)
-    print(updList)
 
     current = updList[0]
     path = [current]
@@ -212,6 +211,6 @@ if __name__ == "__main__":
 
     path.append(path[0])
 
-    print("Result path: ", path)
+    print("Path: ", *path)
 
     print_list(updList)
