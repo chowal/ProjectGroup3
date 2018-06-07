@@ -208,11 +208,7 @@ def print_list(eul_list, f_name):
     for i in eul_list:
         for c in t.cities:
             if str(i) == str(c.cid):
-                try:
-                    ans += t.distance(t.cities[i], t.cities[i+1]) 
-                except:
-                    # compensating for the last city which needs the distance to start
-                    ans += t.distance(t.cities[i], t.cities[0]) 
+                ans += t.distance(t.cities[i], t.cities[i-1]) 
 
     f.write(str(int(ans))+ '\n')
 
