@@ -6,8 +6,6 @@
 import argparse
 import math
 from collections import defaultdict
-import pdb
-
 
 def addEdge(graph, u, v):
     graph[u].append(v)
@@ -33,6 +31,7 @@ class city_obj():
         city class
         -> cid = city identifier
         -> priority = distances
+    
         -> parent = parent vertex on the graph
         -> x = x coordinate
         -> y = y coordinate
@@ -69,6 +68,14 @@ class tsp():
             city = city.strip('\n')
             # grabbing the identfier
             city_id = city.split(' ')[0]
+            if city_id == "":
+                cid = None
+                for n in city.split(' '):
+                    if n != "":
+                        if not cid:
+                            cid = n
+                            break
+                city_id = cid
             # grabbing the coordinates
             coords = city.split(' ')[-2:]
             # creating a new city object with id and coordinates
@@ -78,17 +85,17 @@ class tsp():
                 # compensating for lines with extraneous spaces
                 x = None
                 coords = city.split(' ')
-                del coords[0]
+                #del coords[0]
                 for i in coords:
                     if i != "":
                         if not x:
                             x = i
                         else:
                             y = i
-                
                 new_city = city_obj(city_id, int(x), int(y))
             # adding the new city to the list of cities
             self.cities.append(new_city)
+
 
     def prims(self, city_list):
         """
@@ -106,7 +113,6 @@ class tsp():
         mst = defaultdict(list)
         for i in range(len(city_list) - 1):
             minimum = 9999999999999
-            #minVertex = city_obj(0, 0, 0)
             minVertex = start
             for v in city_list:
                 if v.priority > 0 and v.priority < minimum:
