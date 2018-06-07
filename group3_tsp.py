@@ -88,8 +88,7 @@ class tsp():
             v.priority = self.distance(v, start)
             v.parent = start
         mst = defaultdict(list)
-        for i in range(len(city_list)-1git
-        ):
+        for i in range(len(city_list)-1):
             minimum = 9999999999999
             minVertex = city_obj(0,0,0)
             for v in city_list:
