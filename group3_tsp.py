@@ -6,6 +6,26 @@
 
 import argparse
 import math
+from collections import defaultdict
+
+
+def addEdge(graph, u, v):
+    graph[u].append(v)
+
+
+# definition of function
+def generate_edges(graph):
+    edges = []
+
+    # for each node in graph
+    for node in graph:
+
+        # for each neighbour node of a single node
+        for neighbour in graph[node]:
+            # if edge exists then append
+            edges.append((node, neighbour))
+    return edges
+
 
 class city_obj():
     """
@@ -15,7 +35,7 @@ class city_obj():
         -> parent = parent vertex on the graph
         -> x = x coordinate
         -> y = y coordinate
-        -> neighbors = list of neighoring vertices
+        -> neighbors = list of neighboring vertices
     """
     def __init__(self, city_id, x_coord, y_coord):
         self.cid = city_id
@@ -67,7 +87,7 @@ class tsp():
         for v in city_list:
             v.priority = self.distance(v, start)
             v.parent = start
-        MST = []
+        mst = defaultdict(list)
         for i in range(len(city_list)):
             minimum = 9999999999999
             minVertex = city_obj(0,0,0)
@@ -77,7 +97,7 @@ class tsp():
                     minVertex = v
             minVertex.priority = 0
             # add edge to MST
-            #MST.append(
+            addEdge(mst, minVertex, minVertex.parent)
             for v in city_list:
                 if v.priority > self.distance(v, minVertex):
                     v.priority = self.distance(v, minVertex)
@@ -102,10 +122,9 @@ class tsp():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description= "TSP Project - Christofides Algorithm")
-    parser.add_argument('filename', help="Enter the file name as 1st arg")
-    arg = parser.parse_args()
-
+    #parser.add_argument('filename', help="Enter the file name as 1st arg")
+    #arg = parser.parse_args()
     
-    t = tsp(arg.filename)
+    t = tsp('tsp_example_1.txt')
     t.process_file()
     t.prims(t.cities)
