@@ -2,12 +2,11 @@
 # description: 
 #
 #
-#
 
 import argparse
 import math
 from collections import defaultdict
-
+from datetime import datetime
 
 def addEdge(graph, u, v):
     graph[u].append(v)
@@ -24,6 +23,7 @@ def generate_edges(graph):
         for neighbour in graph[node]:
             # if edge exists then append
             edges.append((int(node.cid), int(neighbour.cid)))
+
     return edges
 
 
@@ -32,6 +32,7 @@ class city_obj():
         city class
         -> cid = city identifier
         -> priority = distances
+    
         -> parent = parent vertex on the graph
         -> x = x coordinate
         -> y = y coordinate
@@ -68,12 +69,34 @@ class tsp():
             city = city.strip('\n')
             # grabbing the identfier
             city_id = city.split(' ')[0]
+            if city_id == "":
+                cid = None
+                for n in city.split(' '):
+                    if n != "":
+                        if not cid:
+                            cid = n
+                            break
+                city_id = cid
             # grabbing the coordinates
             coords = city.split(' ')[-2:]
             # creating a new city object with id and coordinates
-            new_city = city_obj(city_id, int(coords[0]), int(coords[1]))
+            try:
+                new_city = city_obj(city_id, int(coords[0]), int(coords[1]))
+            except:
+                # compensating for lines with extraneous spaces
+                x = None
+                coords = city.split(' ')
+                #del coords[0]
+                for i in coords:
+                    if i != "":
+                        if not x:
+                            x = i
+                        else:
+                            y = i
+                new_city = city_obj(city_id, int(x), int(y))
             # adding the new city to the list of cities
             self.cities.append(new_city)
+
 
     def prims(self, city_list):
         """
@@ -91,7 +114,7 @@ class tsp():
         mst = defaultdict(list)
         for i in range(len(city_list) - 1):
             minimum = 9999999999999
-            minVertex = city_obj(0, 0, 0)
+            minVertex = start
             for v in city_list:
                 if v.priority > 0 and v.priority < minimum:
                     minimum = v.priority
@@ -118,7 +141,7 @@ class tsp():
         """
         x = (c2.x - c1.x) ** 2
         y = (c2.y - c1.y) ** 2
-        d = math.sqrt(x + y)
+        d = int(round(math.sqrt(x + y)))
         return d
 
 
@@ -181,19 +204,6 @@ def euler_circuit(graph):
     # Return the city set that was created
     return cities
 
-
-def distance_add_up(main_graph, euler_tour_set):
-    path_length = 0
-    #print(len(euler_tour_set))
-    for idx in range(0, len(euler_tour_set)):
-        if idx > 0:
-            x = (main_graph[euler_tour_set[idx]].x - main_graph[euler_tour_set[idx-1]].x) ** 2
-            y = (main_graph[euler_tour_set[idx]].y - main_graph[euler_tour_set[idx-1]].y) ** 2
-            d = math.sqrt(x + y)
-            path_length += d
-    return round(path_length)
-
-
 def euler_tour(mst_set):
     # Create a variable to keep track of the connected city set possibilities
     city_sets = {}
@@ -209,8 +219,7 @@ def euler_tour(mst_set):
         city_sets[connection[0]].append(connection[1])
         city_sets[connection[1]].append(connection[0])
 
-    # DEBUG: PRINT OUT THE CITY SETS TO ENSURE THEY ARE OPUTTING CORRECTLY
-    # print("City Sets: ", city_sets)
+    #print("City Sets: ", city_sets)
 
     # Now find the shortest cycle between all of the cities
 
@@ -237,7 +246,7 @@ def euler_tour(mst_set):
             i += 1
             # Add the previously deleted city back into the circuit
             circuit.insert(i, temp)
-            # Set the current city as the next starting location for the loop
+
             curr_city = temp
 
     return circuit
@@ -251,44 +260,38 @@ def connection_cleanup(mst_set, v1, v2):
 
     return mst_set
 
-def print_list(eul_list, path_length):
-    outfile = 'tsp_output.txt'
+def print_list(eul_list, f_name):
+    outfile = "group3_" + f_name + ".tour"
     f = open(outfile, 'w')
-    f.write(str(path_length) + '\n')
+    ans = 0
+    for i in eul_list:
+        for c in t.cities:
+            if str(i) == str(c.cid):
+                ans += t.distance(t.cities[i], t.cities[i-1]) 
+
+    f.write(str(int(ans))+ '\n')
+
     for ele in eul_list:
         f.write(str(ele) + '\n')
 
     f.close()
 
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="TSP Project - Christofides Algorithm")
-    # parser.add_argument('filename', help="Enter the file name as 1st arg")
-    # arg = parser.parse_args()
+    parser.add_argument('filename', help="Enter the file name as 1st arg")
+    arg = parser.parse_args()
 
-    t = tsp('tsp_example_1.txt')
+    t = tsp(arg.filename)
     t.process_file()
+   
+    start = datetime.now().time()
     myList = t.prims(t.cities)
-    #updList = euler_tour(myList)
     updList = euler_circuit(myList)
-    #print(updList)
 
-    #current = updList[0]
-    #path = [current]
-    #visited = [False] * len(updList)
-
-    #length = 0
-
-    #for v in updList[1:]:
-    #    if not visited[v]:
-    #        path.append(v)
-    #        visited[v] = True
-
-    #        current = v
-
-    #path.append(path[0])
-
+    finish = datetime.now().time()
+    t_format = "%H:%M:%S.%f"
+    delta = datetime.strptime(str(finish), t_format) - datetime.strptime(str(start), t_format)
+    print("Completion time: ", delta)
     #print("Path: ", *path)
-
-    path_size = distance_add_up(t.cities, updList)
-
-    print_list(updList, path_size)
+    print_list(updList, arg.filename)
