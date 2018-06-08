@@ -122,6 +122,78 @@ class tsp():
         return d
 
 
+def euler_circuit(graph):
+    # Build a list where we can store the cities in
+    cities = []
+    temp_graph = graph
+
+    edge_tally = defaultdict(int)
+
+    # We will utilize Hierholzer's in a recursive fashion to assist with finding a suitable circuit.
+    def create_tour(curr_city):
+        # Loop through each element in the previous graph
+        for e in range(len(temp_graph)):
+            # If the city is equal to 0 then bypass this loop
+            if temp_graph[e] == 0:
+                continue
+            # Otherwise if the city in question is equal to the starting point
+            if curr_city == temp_graph[e][0]:
+                # Modify the city set in the current location
+                curr_city, connected_city = temp_graph[e]
+                temp_graph[e] = 0
+                create_tour(connected_city)
+            elif curr_city == temp_graph[e][1]:
+                connected_city, curr_city = temp_graph[e]
+                temp_graph[e] = 0
+                create_tour(connected_city)
+        cities.insert(0, curr_city)
+
+    # Tally up the number of edges spanning out of each city (forwards and backwards)
+    for i,j in graph:
+        # Add one to the first city in the set
+        edge_tally[i] += 1
+        # Add one to the second city in the set
+        edge_tally[j] += 1
+
+    # Set the starting value to the first city in the graph
+    start = graph[0][0]
+
+    # Loop through each city set until we find one with an odd amount of edges
+    for i,j in edge_tally.items():
+        if j % 2 > 0:
+            # Set the starting point to the first element with an odd amount of edges
+            start = i
+            break
+
+    # Set the beginning of the search to the first city set earlier
+    current = start
+
+    # Build the tour / circuit
+    create_tour(current)
+
+    # Add the first city to complete the circuit
+    cities.append(cities[0])
+
+    # Ensure that we successfully completed the circuit (first and last items are the same)
+    if cities[0] != cities[-1]:
+        return None
+
+    # Return the city set that was created
+    return cities
+
+
+def distance_add_up(main_graph, euler_tour_set):
+    path_length = 0
+    #print(len(euler_tour_set))
+    for idx in range(0, len(euler_tour_set)):
+        if idx > 0:
+            x = (main_graph[euler_tour_set[idx]].x - main_graph[euler_tour_set[idx-1]].x) ** 2
+            y = (main_graph[euler_tour_set[idx]].y - main_graph[euler_tour_set[idx-1]].y) ** 2
+            d = math.sqrt(x + y)
+            path_length += d
+    return round(path_length)
+
+
 def euler_tour(mst_set):
     # Create a variable to keep track of the connected city set possibilities
     city_sets = {}
@@ -137,7 +209,8 @@ def euler_tour(mst_set):
         city_sets[connection[0]].append(connection[1])
         city_sets[connection[1]].append(connection[0])
 
-    print("City Sets: ", city_sets)
+    # DEBUG: PRINT OUT THE CITY SETS TO ENSURE THEY ARE OPUTTING CORRECTLY
+    # print("City Sets: ", city_sets)
 
     # Now find the shortest cycle between all of the cities
 
@@ -164,7 +237,7 @@ def euler_tour(mst_set):
             i += 1
             # Add the previously deleted city back into the circuit
             circuit.insert(i, temp)
-
+            # Set the current city as the next starting location for the loop
             curr_city = temp
 
     return circuit
@@ -178,9 +251,10 @@ def connection_cleanup(mst_set, v1, v2):
 
     return mst_set
 
-def print_list(eul_list):
+def print_list(eul_list, path_length):
     outfile = 'tsp_output.txt'
     f = open(outfile, 'w')
+    f.write(str(path_length) + '\n')
     for ele in eul_list:
         f.write(str(ele) + '\n')
 
@@ -194,23 +268,27 @@ if __name__ == "__main__":
     t = tsp('tsp_example_1.txt')
     t.process_file()
     myList = t.prims(t.cities)
-    updList = euler_tour(myList)
+    #updList = euler_tour(myList)
+    updList = euler_circuit(myList)
+    #print(updList)
 
-    current = updList[0]
-    path = [current]
-    visited = [False] * len(updList)
+    #current = updList[0]
+    #path = [current]
+    #visited = [False] * len(updList)
 
-    length = 0
+    #length = 0
 
-    for v in updList[1:]:
-        if not visited[v]:
-            path.append(v)
-            visited[v] = True
+    #for v in updList[1:]:
+    #    if not visited[v]:
+    #        path.append(v)
+    #        visited[v] = True
 
-            current = v
+    #        current = v
 
-    path.append(path[0])
+    #path.append(path[0])
 
-    print("Path: ", *path)
+    #print("Path: ", *path)
 
-    print_list(updList)
+    path_size = distance_add_up(t.cities, updList)
+
+    print_list(updList, path_size)
